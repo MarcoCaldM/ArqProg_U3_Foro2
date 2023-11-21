@@ -291,10 +291,9 @@ void HVAC_ActualizarEntradas(void)
         {
             EstadoEntradas.SystemState = Off;
             //******************************************************
+            print("Salida y HeatBeat apagados\n\r");
             Task_setPri(((pthread_Obj*)salidas_thread)->task, -1);
             Task_setPri(((pthread_Obj*)heartbeat_thread)->task, -1);
-            sprintf(state,"Salida y HeatBeat apagados\r\n");
-            print(state);
             //******************************************************
             if(ultimos_estados[3] == FALSE)
                 event = TRUE;
