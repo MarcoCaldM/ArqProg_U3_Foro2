@@ -254,6 +254,10 @@ void HVAC_ActualizarEntradas(void)
     {
         EstadoEntradas.FanState = On;
         EstadoEntradas.SystemState = FanOnly;
+        //******************************************************
+        Task_setPri(((pthread_Obj*)salidas_thread)->task, 1);
+        Task_setPri(((pthread_Obj*)heartbeat_thread)->task, 1);
+        //******************************************************
         if(ultimos_estados[0] == FALSE)                 //SI ULTIMO ESTADO FANSTATE NO ES ON
             event = TRUE;                               //BANDERA OCURRIO EVENTO
 
@@ -264,10 +268,6 @@ void HVAC_ActualizarEntradas(void)
     else if((data[3] & GPIO_PIN_STATUS) != NORMAL_STATE_EXTRA_BUTTONS)   // Cambia el valor de las entradas SYSTEM.
     {
         EstadoEntradas.FanState = Auto;                //PON fanstate en AUTO
-        //******************************************************
-        Task_setPri(((pthread_Obj*)salidas_thread)->task, 1);
-        Task_setPri(((pthread_Obj*)heartbeat_thread)->task, 1);
-        //******************************************************
         if(ultimos_estados[1] == FALSE)                //SI ULTIMO ESTADO FANSTATE NO ES AUTO
             event = TRUE;                              //BANDERA OCURRIO EVENTO
 
@@ -277,6 +277,10 @@ void HVAC_ActualizarEntradas(void)
         if((data[4] & GPIO_PIN_STATUS) != NORMAL_STATE_EXTRA_BUTTONS)   // Y as� sucesivamente para el resto de pines.
         {
             EstadoEntradas.SystemState = Cool;
+            //******************************************************
+            Task_setPri(((pthread_Obj*)salidas_thread)->task, 1);
+            Task_setPri(((pthread_Obj*)heartbeat_thread)->task, 1);
+            //******************************************************
             if(ultimos_estados[2] == FALSE)
                 event = TRUE;
             ultimos_estados[2] = TRUE;
@@ -289,7 +293,8 @@ void HVAC_ActualizarEntradas(void)
             //******************************************************
             Task_setPri(((pthread_Obj*)salidas_thread)->task, -1);
             Task_setPri(((pthread_Obj*)heartbeat_thread)->task, -1);
-            print("Salida y HeatBeat apagados\r\n");
+            sprintf(state,"Salida y HeatBeat apagados\r\n");
+            print(state);
             //******************************************************
             if(ultimos_estados[3] == FALSE)
                 event = TRUE;
