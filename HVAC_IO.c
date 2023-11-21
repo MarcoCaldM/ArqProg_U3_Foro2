@@ -318,6 +318,10 @@ void HVAC_ActualizarEntradas(void)
         else
         {
             EstadoEntradas.SystemState = Off;       //SI NO SE PRESIONO CUALQUIERA DELOS BOTONES PASADOS PON SystemState en OFF
+            //******************************************************
+            Task_setPri(((pthread_Obj*)salidas_thread)->task, -1);
+            Task_setPri(((pthread_Obj*)heartbeat_thread)->task, -1);
+            //******************************************************
             ultimos_estados[2] = FALSE;
             ultimos_estados[3] = FALSE;
             ultimos_estados[4] = FALSE;
