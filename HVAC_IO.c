@@ -264,6 +264,10 @@ void HVAC_ActualizarEntradas(void)
     else if((data[3] & GPIO_PIN_STATUS) != NORMAL_STATE_EXTRA_BUTTONS)   // Cambia el valor de las entradas SYSTEM.
     {
         EstadoEntradas.FanState = Auto;                //PON fanstate en AUTO
+        //******************************************************
+        Task_setPri(((pthread_Obj*)salidas_thread)->task, 1);
+        Task_setPri(((pthread_Obj*)heartbeat_thread)->task, 1);
+        //******************************************************
         if(ultimos_estados[1] == FALSE)                //SI ULTIMO ESTADO FANSTATE NO ES AUTO
             event = TRUE;                              //BANDERA OCURRIO EVENTO
 
@@ -282,6 +286,11 @@ void HVAC_ActualizarEntradas(void)
         else if((data[5] & GPIO_PIN_STATUS) != NORMAL_STATE_EXTRA_BUTTONS)
         {
             EstadoEntradas.SystemState = Off;
+            //******************************************************
+            Task_setPri(((pthread_Obj*)salidas_thread)->task, -1);
+            Task_setPri(((pthread_Obj*)heartbeat_thread)->task, -1);
+            print("Salida y HeatBeat apagados\r\n");
+            //******************************************************
             if(ultimos_estados[3] == FALSE)
                 event = TRUE;
             ultimos_estados[2] = FALSE;
@@ -291,6 +300,10 @@ void HVAC_ActualizarEntradas(void)
         else if((data[6] & GPIO_PIN_STATUS) != NORMAL_STATE_EXTRA_BUTTONS)
         {
             EstadoEntradas.SystemState = Heat;
+            //******************************************************
+            Task_setPri(((pthread_Obj*)salidas_thread)->task, 1);
+            Task_setPri(((pthread_Obj*)heartbeat_thread)->task, 1);
+            //******************************************************
             if(ultimos_estados[4] == FALSE)
                 event = TRUE;
             ultimos_estados[2] = FALSE;
@@ -336,14 +349,11 @@ void HVAC_ActualizarSalidas(void)
                     ioctl(output_port, GPIO_IOCTL_WRITE_LOG0, &heat);
                     ioctl(output_port, GPIO_IOCTL_WRITE_LOG0, &cool);
                     FAN_LED_State = 0;
-                    //******************************************************
-                    Task_setPri(((pthread_Obj*)salidas_thread)->task, -1);
-                    Task_setPri(((pthread_Obj*)heartbeat_thread)->task, -1);
-                    print("Salida y HeatBeat apagados\r\n");
-                    //******************************************************
                     break;
-        case Heat:  HVAC_Heat(); break;
-        case Cool:  HVAC_Cool(); break;
+        case Heat:  HVAC_Heat();
+                    break;
+        case Cool:  HVAC_Cool();
+                    break;
         }
     }
 }
